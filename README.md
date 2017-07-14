@@ -1,0 +1,1 @@
+This project allows you to search for locations where you would need to do multiple things. For example, with Location Search you could look for theaters where you could watch a movie, then go grocery shopping, and grab a bit to eat all within a desired radius.
