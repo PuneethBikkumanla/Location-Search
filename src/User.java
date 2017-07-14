@@ -79,30 +79,47 @@ public class User {
 				Param.name("opennow").value(true));
 		
 		//List<Place> places = client.getPlacesByQuery(location, GooglePlaces.MAXIMUM_RESULTS);
+		
+		
+		
+		for(Place iter: mainLocation) {  //Maybe for initializing the set
+			 map.put(iter.getName(), new HashSet<List<Place>>());
+		}
+		
+		
+		
+		
+		
 		for(Place iter: mainLocation){				
 			
 			Set<List<Place>> tempSet = new HashSet<List<Place>>();
 			
-			for(int i=0; i<listOfKeywords.length; i++) {
-				String requirementString = listOfKeywords[i] + " near " + iter.getVicinity();
+				for(int i=0; i<listOfKeywords.length; i++) {
+					String requirementString = listOfKeywords[i] + " near " + iter.getVicinity();
+					
+					try {
+					
+					List<Place> something = Client.client.getPlacesByQuery(requirementString, GooglePlaces.MAXIMUM_RESULTS, 
+							Param.name("opennow").value(true), Param.name("radius").value(1609.34));
 				
-				List<Place> something = Client.client.getPlacesByQuery(requirementString, GooglePlaces.MAXIMUM_RESULTS, 
-						Param.name("opennow").value(true), Param.name("radius").value(1609.34));
+					tempSet.add(something);
+					
+					}
+					catch(GooglePlacesException e) {
+						map.remove(iter.getName());
+					}
+				}
 			
-				tempSet.add(something);
+			if(map.containsKey(iter.getName())) {
+				map.put(iter.getName(), tempSet);
 			}
+			
+			
 		}
 		
 		}catch(GooglePlacesException e) {
 			System.out.println("Oops! Nothing found");
 		}
-		
-		
-		/*for(Place temp: places)
-		{
-			String address = temp.getName();
-			
-		}*/
 		
 	}
 	
