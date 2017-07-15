@@ -14,7 +14,7 @@ import se.walkercrou.places.exception.NoResultsFoundException;
 
 public class User {
 		
-	String location, requirements, firstReq, initialRequest;
+	String location, requirements = " ", firstReq, initialRequest;
 	String[] listOfKeywords;
 	HashMap<String, Set<List<Place>>> map = new HashMap<String, Set<List<Place>>>(); 
 	List<Place> mainLocation;
@@ -38,7 +38,8 @@ public class User {
 		initialRequest = firstReq + " near " + location;
 		
 		System.out.println("Please enter other keywords with a space in between them");
-		requirements=reader.readLine();
+		requirements+=reader.readLine();
+		
 		}
 		catch(IOException e) {
 			e.printStackTrace();
@@ -49,30 +50,16 @@ public class User {
 		User query = new User();
 		
 		query.processingKeywords();
-		query.getResult();
-		
-		/*for(String temp: list)
-		{
-			getList(temp);
-		}*/	
+		query.processInput();
+	
 	}
 	
 	public void processingKeywords() {
-		String[] listOfKeywords=requirements.split(" ");
+		listOfKeywords=requirements.split(" ");
 	}
 	
 	
-	
-	public static void getList(String type)
-	{
-		List<Place> places = Client.client.getPlacesByQuery(type, GooglePlaces.MAXIMUM_RESULTS);
-		for(Place temp: places)
-		{
-			System.out.println(temp.getName());
-		}
-	}
-	
-	public void getResult() {
+	public void processInput() {
 		try {
 		
 		mainLocation = Client.client.getPlacesByQuery(initialRequest, GooglePlaces.MAXIMUM_RESULTS, 
@@ -87,33 +74,29 @@ public class User {
 		}
 		
 		
-		
-		
-		
 		for(Place iter: mainLocation){				
 			
-			Set<List<Place>> tempSet = new HashSet<List<Place>>();
-			
-				for(int i=0; i<listOfKeywords.length; i++) {
-					String requirementString = listOfKeywords[i] + " near " + iter.getVicinity();
+			for(String word : listOfKeywords) {
+					String requirementString = word + " near " + iter.getName();
 					
 					try {
 					
 					List<Place> something = Client.client.getPlacesByQuery(requirementString, GooglePlaces.MAXIMUM_RESULTS, 
 							Param.name("opennow").value(true), Param.name("radius").value(1609.34));
-				
-					tempSet.add(something);
+					
+					for(Place temp: something) {
+						System.out.println(temp.getName());
+					}
+					System.out.println();
+					
+					map.get(iter.getName()).add(something);
 					
 					}
 					catch(GooglePlacesException e) {
 						map.remove(iter.getName());
+						break;
 					}
 				}
-			
-			if(map.containsKey(iter.getName())) {
-				map.put(iter.getName(), tempSet);
-			}
-			
 			
 		}
 		
@@ -121,6 +104,15 @@ public class User {
 			System.out.println("Oops! Nothing found");
 		}
 		
+	}
+	
+	
+	public void printResult() {
+		System.out.println(map.keySet().size());
+		
+		for(String temp: map.keySet()) {
+			System.out.println(temp);
+		}
 	}
 	
 	
